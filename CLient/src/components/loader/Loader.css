@@ -1,0 +1,24 @@
+/* src/components/Loader.css */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.blink-loader {
+  animation: blink 1s infinite;
+}
+
+/* Define the blink animation */
+@keyframes blink {
+  0% {
+    opacity: 1; /* Fully visible */
+  }
+  50% {
+    opacity: 0; /* Invisible */
+  }
+  100% {
+    opacity: 1; /* Fully visible again */
+  }
+}
