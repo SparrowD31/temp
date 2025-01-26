@@ -14,7 +14,7 @@ export default function SearchResults() {
             {searchResults.map((product) => (
               <Link
                 key={product.id}
-                to={`/product/${product.id}`}
+                to={`/user/product/${product.id}`}
                 onClick={clearSearch}
                 className="flex items-center gap-4 p-2 hover:bg-gray-50"
               >

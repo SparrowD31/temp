@@ -13,6 +13,8 @@ export function AuthProvider({ children }) {
     }
   });
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Add debug logging to track auth state
   useEffect(() => {
@@ -109,6 +111,8 @@ export function AuthProvider({ children }) {
       
       localStorage.setItem('userData', JSON.stringify(normalizedUser));
       setUser(normalizedUser);
+      setIsAuthenticated(true);
+      setIsAdmin(normalizedUser.role === 'admin');
       
       return { token: data.token, user: normalizedUser };
     } catch (error) {
@@ -123,6 +127,8 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem('razorPayId');
     localStorage.removeItem('userData');
     setUser(null);
+    setIsAuthenticated(false);
+    setIsAdmin(false);
   };
 
   const updateUserProfile = async (userData) => {

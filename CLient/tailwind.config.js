@@ -7,7 +7,7 @@ export default {
   		animation: {
   			'fade-in-up': 'fade-in-up 0.2s ease-out forwards',
   			'blink': 'blink 1.5s ease-in-out infinite',
-  			'scroll': 'scroll 20s linear infinite'
+  			'scroll': 'scroll 30s linear infinite'
   		},
   		keyframes: {
   			'blink': {
@@ -68,5 +68,19 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  variants: {
+    extend: {
+      animation: ['hover', 'group-hover'],
+    },
+  },
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }) {
+      addUtilities({
+        '.pause': {
+          'animation-play-state': 'paused',
+        }
+      })
+    }
+  ]
 };
