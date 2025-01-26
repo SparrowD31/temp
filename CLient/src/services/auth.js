@@ -20,8 +20,8 @@ export const loginUser = async (credentials) => {
     const data = await response.json();
     
     // Store user data and token
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    sessionStorage.setItem('authToken', data.token);
+    sessionStorage.setItem('user', JSON.stringify(data.user));
     
     return data;
   } catch (error) {
@@ -55,17 +55,17 @@ export const registerUser = async (userData) => {
 
 // Add utility functions for authentication
 export const getCurrentUser = () => {
-  const userStr = localStorage.getItem('user');
+  const userStr = localStorage.getItem('userData');
   return userStr ? JSON.parse(userStr) : null;
 };
 
 export const getToken = () => {
-  return localStorage.getItem('token');
+  return sessionStorage.getItem('authToken');
 };
 
 export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  sessionStorage.removeItem('authToken');
+  sessionStorage.removeItem('user');
 };
 
 // Function to check if user is authenticated

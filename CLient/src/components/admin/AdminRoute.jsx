@@ -10,7 +10,7 @@ const AdminRoute = ({ children }) => {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
           setChecking(false);
           return;

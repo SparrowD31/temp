@@ -79,7 +79,7 @@ export default function AddressSelection() {
     const formData = new FormData(e.target);
     
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('authToken');
       if (!token) {
         showToast('Please login to save address');
         navigate('/auth/login');
@@ -153,7 +153,7 @@ export default function AddressSelection() {
 
   // Debug logging to check user and token
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('authToken');
     console.log('Current user:', user);
     console.log('Token exists:', !!token);
   }, [user]);

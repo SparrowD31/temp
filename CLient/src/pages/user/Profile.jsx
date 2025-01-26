@@ -83,7 +83,7 @@ export default function Profile() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
         },
         body: JSON.stringify({ address: updatedAddresses }),
       });
@@ -113,7 +113,7 @@ export default function Profile() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
         },
         body: JSON.stringify({ mobile: userData?.mobile })
       });
@@ -146,7 +146,7 @@ export default function Profile() {
         
         const response = await fetch(`/api/users/${userId}`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
           }
         });
         
@@ -194,7 +194,7 @@ export default function Profile() {
         setIsLoading(true);
         const response = await fetch(`/api/orders?userId=${userId}`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
           }
         });
         

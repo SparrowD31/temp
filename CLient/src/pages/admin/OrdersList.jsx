@@ -17,7 +17,7 @@ const OrdersList = () => {
       
       const response = await fetch('http://localhost:3000/api/admin/orders', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
         }
       });
@@ -47,7 +47,7 @@ const OrdersList = () => {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus })

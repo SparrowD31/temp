@@ -15,7 +15,7 @@ const ReturnRequests = () => {
       setLoading(true);
       const response = await fetch(`http://localhost:5000/api/admin/returns?status=${filter}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
         }
       });
@@ -39,7 +39,7 @@ const ReturnRequests = () => {
       const response = await fetch(`http://localhost:5000/api/admin/returns/${returnId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: action })
