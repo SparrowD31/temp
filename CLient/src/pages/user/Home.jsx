@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { mockProducts } from '../../data/mockData';
 
 export default function Home() {
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -61,6 +62,12 @@ export default function Home() {
     setNewReview({ rating: 0, title: '', customTitle: '', review: '' });
   };
 
+  // Get first product of each color
+  const getFirstProductByColor = (color) => {
+    const product = mockProducts.find(p => p.category === color);
+    return product ? product.id : '';
+  };
+
   return (
     <div className="pt-16">
       {/* Hero Section */}
@@ -118,7 +125,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 animate-fadeIn">
           {/* Black Card */}
           <Link 
-            to="/user/category/black" 
+            to={`/user/product/${getFirstProductByColor('black')}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
@@ -141,7 +148,7 @@ export default function Home() {
 
           {/* Brown Card */}
           <Link 
-            to="/user/category/brown" 
+            to={`/user/product/${getFirstProductByColor('brown')}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
@@ -164,7 +171,7 @@ export default function Home() {
 
           {/* Beige Card */}
           <Link 
-            to="/user/category/beige" 
+            to={`/user/product/${getFirstProductByColor('beige')}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
@@ -187,7 +194,7 @@ export default function Home() {
 
           {/* Maroon Card */}
           <Link 
-            to="/user/category/maroon" 
+            to={`/user/product/${getFirstProductByColor('maroon')}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
@@ -210,7 +217,7 @@ export default function Home() {
 
           {/* Yellow Card */}
           <Link 
-            to="/user/category/yellow" 
+            to={`/user/product/${getFirstProductByColor('yellow')}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <img
