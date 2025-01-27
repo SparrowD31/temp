@@ -1,7 +1,7 @@
 export const mockProducts = [
   {
-    id: '164f9ec0b5c6a2a347d3d72a1',
-    name: 'Oversized Cotton Shirt',
+    id: '64f9ec0b5c6a2a347d3d72a1',
+    name: 'Bear Yellow Sweatshirt',
     price: 400.00,
     images: [
       'https://res.cloudinary.com/dzmtqeyag/image/upload/v1737823565/2bbe0574f1dc46b3a99c76e9cfa816ea_hlurgl.webp',
@@ -17,8 +17,8 @@ export const mockProducts = [
   },
 
   {
-    id: '164f9ec0b5c6a2a347d3d72a2',
-    name: 'High-Waisted Tailored Pants',
+    id: '64f9ec0b5c6a2a347d3d72a2',
+    name: 'Recharge Brown Sweatshirt',
     price: 400.00,
     images: [
       'https://res.cloudinary.com/dzmtqeyag/image/upload/v1737823444/68fea6706e8d4ba9b0159c0fb71d5253_qezte0.webp',
@@ -36,8 +36,8 @@ export const mockProducts = [
   },
 
   {
-    id: '64f9ec0b5c6a2a347d3d72a9',
-    name: 'Classic Denim Jacket',
+    id: '64f9ec0b5c6a2a347d3d72a3',
+    name: 'JustLivin Maroon Sweatshirt',
     price: 400.00,
     images: [
       'https://res.cloudinary.com/dzmtqeyag/image/upload/v1737296589/5b82656efcdd44f691f704cdeb979f0c_-_Copy_wrcucb.webp',
@@ -55,8 +55,8 @@ export const mockProducts = [
   },
 
   {
-    id: '64f9ec0b5c6a2a347d3d72a8',
-    name: 'Linen Blend Blazer',
+    id: '64f9ec0b5c6a2a347d3d72a4',
+    name: 'StarDust Beige Sweatshirt',
     price: 400.00,
     images: [
       'https://res.cloudinary.com/dzmtqeyag/image/upload/v1737822695/2ca212bff60a420aa6a4f179a2cbfb18_jqb59m.webp',

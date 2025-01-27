@@ -1,10 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_URL = 'http://localhost:3000/api/auth'; // Update this to match your backend URL
+const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(`${baseUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const loginUser = async (credentials) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch(`${baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const isAuthenticated = () => {
 // Function to get authenticated user data
 export const getAuthenticatedUser = async () => {
   try {
-    const response = await fetch(`${API_URL}/me`, {
+    const response = await fetch(`${baseUrl}/api/auth/me`, {
       headers: {
         'Authorization': `Bearer ${getToken()}`,
       },

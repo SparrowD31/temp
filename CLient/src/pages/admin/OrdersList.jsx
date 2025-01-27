@@ -15,7 +15,8 @@ const OrdersList = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:3000/api/admin/orders', {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/orders`, {
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
@@ -44,7 +45,8 @@ const OrdersList = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/orders/${orderId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,

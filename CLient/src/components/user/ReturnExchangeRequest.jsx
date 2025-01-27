@@ -21,7 +21,8 @@ const ReturnExchangeRequest = () => {
         throw new Error('Please log in to submit a return request');
       }
 
-      const response = await fetch('http://localhost:5000/api/returns', {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/returns`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

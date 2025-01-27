@@ -7,7 +7,7 @@ export default {
   		animation: {
   			'fade-in-up': 'fade-in-up 0.2s ease-out forwards',
   			'blink': 'blink 1.5s ease-in-out infinite',
-  			'scroll': 'scroll 30s linear infinite'
+  			'scroll': 'scroll 10s linear infinite'
   		},
   		keyframes: {
   			'blink': {

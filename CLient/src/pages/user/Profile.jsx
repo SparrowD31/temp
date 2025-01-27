@@ -556,7 +556,7 @@ export default function Profile() {
               <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-gray-200">
                 <p className="text-gray-500 mb-4">No orders found.</p>
                 <Link 
-                  to="/user/category/new" 
+                  to="/user/home" 
                   className="inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
                 >
                   Start Shopping

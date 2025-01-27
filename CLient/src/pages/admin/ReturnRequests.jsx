@@ -13,7 +13,8 @@ const ReturnRequests = () => {
   const fetchReturns = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/admin/returns?status=${filter}`, {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/returns?status=${filter}`, {
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
@@ -36,7 +37,8 @@ const ReturnRequests = () => {
 
   const handleReturnAction = async (returnId, action) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/returns/${returnId}`, {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/returns/${returnId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
