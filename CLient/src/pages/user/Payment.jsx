@@ -49,7 +49,7 @@ export default function Payment() {
         prefill: {
           name: user.name || "",
           email: user.email || "",
-          contact: user.phone || ""
+          contact: user.mobile || ""
         },
         theme: {
           color: "#000000"
@@ -150,7 +150,7 @@ export default function Payment() {
             <p>{address.houseNo}, {address.street}</p>
             <p>{address.locality}</p>
             <p>{address.city}, {address.state} {address.postalCode}</p>
-            <p>Phone: {address.phone}</p>
+            <p>Phone: {mergedData.mobile}</p>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, User, Edit2 } from 'lucide-react';
+import { Package, User, Edit2, Plus, MapPin, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToastStore } from '../../store/useToastStore';
 import { Navigate } from 'react-router-dom';
@@ -235,33 +235,39 @@ export default function Profile() {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="pt-24 px-4 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-light mb-8">My Account</h1>
+      <div className="pt-24 px-4 max-w-7xl mx-auto pb-16">
+        <h1 className="text-3xl font-semibold mb-8 text-gray-900">My Account</h1>
 
-        {/* Tabs */}
-        <div className="border-b mb-8">
-          <div className="flex space-x-8">
+        {/* Enhanced Tabs */}
+        <div className="border-b border-gray-200 mb-8">
+          <div className="flex space-x-12">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex items-center space-x-2 pb-4 ${
+              className={`flex items-center space-x-3 pb-4 relative ${
                 activeTab === 'profile'
-                  ? 'border-b-2 border-black'
-                  : 'text-gray-500 hover:text-black'
+                  ? 'text-black'
+                  : 'text-gray-500 hover:text-gray-900'
               }`}
             >
               <User size={20} />
-              <span>Profile</span>
+              <span className="font-medium">Profile</span>
+              {activeTab === 'profile' && (
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-black"></div>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex items-center space-x-2 pb-4 ${
+              className={`flex items-center space-x-3 pb-4 relative ${
                 activeTab === 'orders'
-                  ? 'border-b-2 border-black'
-                  : 'text-gray-500 hover:text-black'
+                  ? 'text-black'
+                  : 'text-gray-500 hover:text-gray-900'
               }`}
             >
               <Package size={20} />
-              <span>Order History</span>
+              <span className="font-medium">Order History</span>
+              {activeTab === 'orders' && (
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-black"></div>
+              )}
             </button>
           </div>
         </div>
@@ -269,52 +275,54 @@ export default function Profile() {
         {/* Profile Tab Content */}
         {activeTab === 'profile' && userData && (
           <div className="max-w-4xl">
-            <div className="space-y-12">
+            <div className="space-y-8">
               {/* Personal Information section */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <h2 className="text-xl font-medium mb-6">Personal Information</h2>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-2xl font-medium mb-6 text-gray-900">Personal Information</h2>
                 <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Full Name</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Full Name</label>
                     <input
                       type="text"
                       value={userData.name || ''}
-                      className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black bg-gray-50"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10 bg-gray-50"
                       readOnly
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Email</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Email</label>
                     <input
                       type="email"
                       value={userData.email || ''}
-                      className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black bg-gray-50"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10 bg-gray-50"
                       readOnly
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-2">Mobile Number</label>
-                    <div className="flex items-center">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Mobile Number</label>
+                    <div className="flex items-center gap-3">
                       <input
                         type="tel"
                         value={userData?.mobile || authUser?.mobile || ''}
                         onChange={handleMobileChange}
-                        className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black bg-gray-50"
+                        className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10 ${
+                          !isEditingMobile ? 'bg-gray-50' : 'bg-white'
+                        }`}
                         disabled={!isEditingMobile}
                       />
                       <button
                         onClick={() => setIsEditingMobile(!isEditingMobile)}
-                        className="ml-2 text-gray-600 hover:text-black"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       >
-                        <Edit2 size={20} />
+                        <Edit2 size={20} className="text-gray-600" />
                       </button>
                     </div>
                     {isEditingMobile && (
                       <button
                         onClick={handleMobileSubmit}
-                        className="mt-2 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
+                        className="mt-3 bg-black text-white px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
                       >
-                        Save
+                        Save Changes
                       </button>
                     )}
                   </div>
@@ -322,154 +330,160 @@ export default function Profile() {
               </div>
 
               {/* Address Information section */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <div className="mb-6">
-                  <h2 className="text-xl font-medium">Address Information</h2>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-medium text-gray-900">Address Information</h2>
+                  <button
+                    onClick={() => setIsAddingNewAddress(!isAddingNewAddress)}
+                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    {isAddingNewAddress ? (
+                      <span>Cancel</span>
+                    ) : (
+                      <>
+                        <span>Add New</span>
+                        <Plus size={18} />
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                {/* Display Addresses */}
-                <div className="space-y-4">
-                  {addresses.length > 0 ? (
-                    <>
-                      {addresses.map((address, index) => (
-                        <div
-                          key={index}
-                          className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                        >
-                          <div className="flex justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{userData?.name || 'User'}</p>
-                              <p className="text-sm text-gray-600 mt-2">
-                                {address.houseNo && `${address.houseNo}, `}
-                                {address.street}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {address.locality && `${address.locality}, `}
-                                {address.city}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {address.state} {address.postalCode && `- ${address.postalCode}`}
-                              </p>
-                              {address.country && (
-                                <p className="text-sm text-gray-600">{address.country}</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {!isAddingNewAddress && (
-                        <div className="flex justify-center mt-6">
-                          <button
-                            onClick={() => setIsAddingNewAddress(true)}
-                            className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
-                          >
-                            Add New Address
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-center py-10 bg-gray-50 rounded-lg">
-                      <p className="text-gray-500 mb-4">No saved addresses found.</p>
-                      <button
-                        onClick={() => setIsAddingNewAddress(true)}
-                        className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
-                      >
-                        Add New Address
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* New Address Form */}
-                {isAddingNewAddress && (
-                  <div className="mt-8 border-t pt-8">
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-lg font-medium">Add New Address</h3>
-                      <button
-                        onClick={() => setIsAddingNewAddress(false)}
-                        className="text-sm text-gray-500 hover:text-black"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                {/* New Address Form - Always present but hidden */}
+                <div className={`transition-all duration-300 overflow-hidden ${isAddingNewAddress ? 'max-h-[1000px] mb-8' : 'max-h-0'}`}>
+                  <div className="border-b border-gray-200 pb-8">
                     <form onSubmit={handleAddressSubmit} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">House/Flat No.</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">House/Flat No.</label>
                           <input
                             type="text"
                             name="houseNo"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">Street</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">Street</label>
                           <input
                             type="text"
                             name="street"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">Locality</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">Locality</label>
                           <input
                             type="text"
                             name="locality"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">City</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">City</label>
                           <input
                             type="text"
                             name="city"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">State</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">State</label>
                           <input
                             type="text"
                             name="state"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">Postal Code</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">Postal Code</label>
                           <input
                             type="text"
                             name="postalCode"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-2">Country</label>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-700">Country</label>
                           <input
                             type="text"
                             name="country"
                             required
-                            className="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:border-black"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/10"
                           />
                         </div>
                       </div>
                       <div className="flex gap-4">
                         <button
                           type="submit"
-                          className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
+                          className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                         >
                           Save Address
                         </button>
                       </div>
                     </form>
                   </div>
-                )}
+                </div>
+
+                {/* Display Addresses as List */}
+                <div className="space-y-4">
+                  {addresses.length > 0 ? (
+                    <div className="space-y-4">
+                      {addresses.map((address, index) => (
+                        <div
+                          key={index}
+                          className="p-6 border border-gray-200 rounded-xl hover:border-gray-300 transition-all hover:shadow-md"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <MapPin size={18} className="text-gray-400" />
+                                <p className="font-medium text-gray-900">{userData?.name || 'User'}</p>
+                              </div>
+                              <div className="space-y-1 text-gray-600 ml-7">
+                                <p>
+                                  {address.houseNo && `${address.houseNo}, `}
+                                  {address.street}
+                                </p>
+                                <p>
+                                  {address.locality && `${address.locality}, `}
+                                  {address.city}
+                                </p>
+                                <p>
+                                  {address.state} {address.postalCode && `- ${address.postalCode}`}
+                                </p>
+                                {address.country && (
+                                  <p>{address.country}</p>
+                                )}
+                              </div>
+                            </div>
+                            {/* Add edit/delete buttons if needed */}
+                            <div className="flex gap-2">
+                              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                <Edit2 size={18} className="text-gray-400" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                      <MapPin size={24} className="mx-auto text-gray-400 mb-3" />
+                      <p className="text-gray-500 mb-4">No saved addresses found.</p>
+                      <button
+                        onClick={() => setIsAddingNewAddress(true)}
+                        className="bg-black text-white px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        Add New Address
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -480,32 +494,28 @@ export default function Profile() {
           <div className="space-y-6">
             {orders.length > 0 ? (
               orders.map((order) => (
-                <div key={order._id} className="bg-white border-2 border-gray-200 rounded-lg shadow-sm overflow-hidden hover:border-gray-300 transition-colors">
+                <div key={order._id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
                   {/* Order Header */}
-                  <div className="p-6 border-b border-gray-200">
+                  <div className="p-6 border-b border-gray-100">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div>
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-medium">Order #{order.orderId}</h3>
-                          <span className={`px-3 py-1 text-sm rounded-full ${
+                          <h3 className="text-lg font-medium">Order #{order.orderId}</h3>
+                          <span className={`px-4 py-1 text-sm rounded-full flex items-center gap-2 ${
                             order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                             order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
                             order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
                             order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
+                            'bg-yellow-100 text-yellow-800'
                           }`}>
-                            <div className="flex items-center">
-                              <span className={`w-2 h-2 rounded-full mr-2 ${
-                                order.status === 'delivered' ? 'bg-green-500' :
-                                order.status === 'processing' ? 'bg-blue-500' :
-                                order.status === 'shipped' ? 'bg-purple-500' :
-                                order.status === 'cancelled' ? 'bg-red-500' :
-                                order.status === 'pending' ? 'bg-yellow-500' :
-                                'bg-gray-500'
-                              }`}></span>
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </div>
+                            <span className={`w-2 h-2 rounded-full ${
+                              order.status === 'delivered' ? 'bg-green-500' :
+                              order.status === 'processing' ? 'bg-blue-500' :
+                              order.status === 'shipped' ? 'bg-purple-500' :
+                              order.status === 'cancelled' ? 'bg-red-500' :
+                              'bg-yellow-500'
+                            }`}></span>
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500">
@@ -518,7 +528,7 @@ export default function Profile() {
                         <p className="text-sm text-gray-500 mt-1">Payment ID: {order.paymentId}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-lg">₹{order.total.toFixed(2)}</p>
+                        <p className="text-2xl font-medium">₹{order.total.toFixed(2)}</p>
                       </div>
                     </div>
                   </div>
@@ -534,18 +544,18 @@ export default function Profile() {
                               <img 
                                 src={item.image} 
                                 alt={item.name}
-                                className="w-16 h-16 object-cover rounded border border-gray-200"
+                                className="w-20 h-20 object-cover rounded-lg border border-gray-100"
                               />
                             )}
                             <div>
                               <p className="font-medium">{item.name}</p>
-                              <div className="text-sm text-gray-500 mt-1">
+                              <div className="text-sm text-gray-500 mt-2 space-x-4">
                                 <span>Qty: {item.quantity}</span>
-                                {item.size && <span className="ml-3">Size: {item.size}</span>}
+                                {item.size && <span>Size: {item.size}</span>}
                               </div>
                             </div>
                           </div>
-                          <p className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
+                          <p className="font-medium text-lg">₹{(item.price * item.quantity).toFixed(2)}</p>
                         </div>
                       ))}
                     </div>
@@ -553,13 +563,15 @@ export default function Profile() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-gray-200">
-                <p className="text-gray-500 mb-4">No orders found.</p>
+              <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <Package size={32} className="mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 mb-6">No orders found.</p>
                 <Link 
                   to="/user/home" 
-                  className="inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
+                  className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  Start Shopping
+                  <ShoppingBag size={18} />
+                  <span>Start Shopping</span>
                 </Link>
               </div>
             )}

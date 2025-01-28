@@ -78,7 +78,7 @@ app.listen(PORT, () => {
 });
 
 app.use(cors({
-  origin: process.env.VITE_BASE_URL ||'http://localhost:5173', // Your Vite frontend URL
+  origin: process.env.VITE_BASE_URL , // Your Vite frontend URL
   credentials: true, // Important for cookies/credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

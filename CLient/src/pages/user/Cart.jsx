@@ -173,7 +173,7 @@ export default function Cart() {
                         <p className="mt-1 text-sm text-gray-500">Size: {item.size}</p>
                       </div>
                       <p className="text-sm font-medium">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        RS: {(item.product.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
 
