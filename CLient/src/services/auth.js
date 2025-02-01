@@ -4,28 +4,47 @@ const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const loginUser = async (credentials) => {
   try {
+    console.log('Attempting login with URL:', `${baseUrl}/api/auth/login`);
+    
     const response = await fetch(`${baseUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Add this for cookies if needed
       body: JSON.stringify(credentials),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+    // Check if response is empty
+    const text = await response.text();
+    if (!text) {
+      throw new Error('Empty response from server');
     }
 
-    const data = await response.json();
+    // Try to parse the response
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('Failed to parse response:', text);
+      throw new Error('Invalid JSON response from server');
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
     
     // Store user data and token
     sessionStorage.setItem('authToken', data.token);
-    sessionStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('userData', JSON.stringify(data.user));
     
     return data;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     throw error;
   }
 };
@@ -92,4 +111,4 @@ export const getAuthenticatedUser = async () => {
     console.error('Get user error:', error);
     throw error;
   }
-}; 
+};
