@@ -2,15 +2,17 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 // Set the base URL for API requests
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+console.log('Base URL:', baseUrl); // Log the base URL for debugging
 
 // Login function
 export const loginUser = async (credentials) => {
   try {
-    console.log('Attempting login with URL:', `${baseUrl}/api/auth/login`);
+    const loginUrl = `${baseUrl}/api/auth/login`;
+    console.log('Attempting login with URL:', loginUrl);
     console.log('Request payload:', credentials);
 
     // Make the login request
-    const response = await fetch(`${baseUrl}/api/auth/login`, {
+    const response = await fetch(loginUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +63,10 @@ export const loginUser = async (credentials) => {
 // Register function
 export const registerUser = async (userData) => {
   try {
-    const response = await fetch(`${baseUrl}/api/auth/register`, {
+    const registerUrl = `${baseUrl}/api/auth/register`;
+    console.log('Attempting registration with URL:', registerUrl);
+
+    const response = await fetch(registerUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
