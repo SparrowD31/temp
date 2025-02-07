@@ -11,19 +11,25 @@ export const loginUser = async (credentials) => {
     console.log('Attempting login with URL:', loginUrl);
     console.log('Request payload:', credentials);
 
-    // Make the login request
     const response = await fetch(loginUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies if needed
+      credentials: 'include',
       body: JSON.stringify(credentials),
     });
 
-    // Log the raw response
-    const text = await response.text(); // Get the response as text
-    console.log('Raw response:', text); // Log the raw response for debugging
+    // Log the response status and body
+    console.log('Response Status:', response.status);
+    const text = await response.text();
+    console.log('Raw response:', text);
+
+    // Handle 503 Service Unavailable
+    if (response.status === 503) {
+      console.error('Service unavailable. Please try again later.');
+      throw new Error('Service unavailable. Please try again later.');
+    }
 
     // Check if the response is OK
     if (!response.ok) {
