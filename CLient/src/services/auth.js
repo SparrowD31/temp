@@ -1,27 +1,35 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
+// Set the base URL for API requests
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Login function
 export const loginUser = async (credentials) => {
   try {
     console.log('Attempting login with URL:', `${baseUrl}/api/auth/login`);
-    
+    console.log('Request payload:', credentials);
+
+    // Make the login request
     const response = await fetch(`${baseUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Add this for cookies if needed
+      credentials: 'include', // Include cookies if needed
       body: JSON.stringify(credentials),
     });
 
-    // Check if response is empty
+    // Log the raw response
     const text = await response.text();
+    console.log('Raw response:', text);
+
+    // Check if the response is empty
     if (!text) {
+      console.error('Empty response from server. Status:', response.status);
       throw new Error('Empty response from server');
     }
 
-    // Try to parse the response
+    // Try to parse the response as JSON
     let data;
     try {
       data = JSON.parse(text);
@@ -30,25 +38,27 @@ export const loginUser = async (credentials) => {
       throw new Error('Invalid JSON response from server');
     }
 
+    // Check if the response is not OK (e.g., 400 or 500 status)
     if (!response.ok) {
       throw new Error(data.message || 'Login failed');
     }
-    
+
     // Store user data and token
     sessionStorage.setItem('authToken', data.token);
     localStorage.setItem('userData', JSON.stringify(data.user));
-    
+
     return data;
   } catch (error) {
     console.error('Login error details:', {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     });
     throw error;
   }
 };
 
+// Register function
 export const registerUser = async (userData) => {
   try {
     const response = await fetch(`${baseUrl}/api/auth/register`, {
@@ -72,7 +82,7 @@ export const registerUser = async (userData) => {
   }
 };
 
-// Add utility functions for authentication
+// Utility functions
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem('userData');
   return userStr ? JSON.parse(userStr) : null;
@@ -87,18 +97,18 @@ export const logout = () => {
   sessionStorage.removeItem('user');
 };
 
-// Function to check if user is authenticated
+// Check if user is authenticated
 export const isAuthenticated = () => {
   const token = getToken();
   return !!token;
 };
 
-// Function to get authenticated user data
+// Get authenticated user data
 export const getAuthenticatedUser = async () => {
   try {
     const response = await fetch(`${baseUrl}/api/auth/me`, {
       headers: {
-        'Authorization': `Bearer ${getToken()}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
 
