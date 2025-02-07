@@ -21,6 +21,13 @@ export const loginUser = async (credentials) => {
       body: JSON.stringify(credentials),
     });
 
+    // Check if the response is OK
+    if (!response.ok) {
+      const errorData = await response.text(); // Get the error response as text
+      console.error('Login failed with status:', response.status, 'Response:', errorData);
+      throw new Error('Login failed: ' + errorData);
+    }
+
     // Log the raw response
     const text = await response.text();
     console.log('Raw response:', text);
@@ -38,11 +45,6 @@ export const loginUser = async (credentials) => {
     } catch (e) {
       console.error('Failed to parse response:', text);
       throw new Error('Invalid JSON response from server');
-    }
-
-    // Check if the response is not OK (e.g., 400 or 500 status)
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed');
     }
 
     // Store user data and token
