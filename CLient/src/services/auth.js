@@ -21,16 +21,15 @@ export const loginUser = async (credentials) => {
       body: JSON.stringify(credentials),
     });
 
+    // Log the raw response
+    const text = await response.text(); // Get the response as text
+    console.log('Raw response:', text); // Log the raw response for debugging
+
     // Check if the response is OK
     if (!response.ok) {
-      const errorData = await response.text(); // Get the error response as text
-      console.error('Login failed with status:', response.status, 'Response:', errorData);
-      throw new Error('Login failed: ' + errorData);
+      console.error('Login failed with status:', response.status, 'Response:', text);
+      throw new Error('Login failed: ' + text);
     }
-
-    // Log the raw response
-    const text = await response.text();
-    console.log('Raw response:', text);
 
     // Check if the response is empty
     if (!text) {
