@@ -58,7 +58,7 @@ export default function Navbar() {
             {/* Updated Home button - visible only on desktop */}
             <Link
               to="/"
-              className="hidden lg:flex items-center space-x-2 ml-4 px-4 py-2 bg-white text-black rounded-md hover:bg-gray-800 transition-all duration-300 group"
+              className="hidden lg:flex items-center space-x-2 ml-4 px-4 py-2 bg-white text-black rounded-md hover:bg-gray-800 hover:text-white transition-all duration-300 group"
             >
               <Home size={20} className="group-hover:scale-110 transition-transform duration-300" />
               <span>Home</span>

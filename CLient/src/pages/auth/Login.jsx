@@ -26,10 +26,6 @@ export default function Login() {
       const data = await login(email, password);
       console.log('Login successful:', data);
       
-      // First ensure login is successful
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Only navigate after the delay
       setIsLoading(false);
       navigate('/user/profile', { replace: true });
       
