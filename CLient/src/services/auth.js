@@ -1,49 +1,27 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-// Set the base URL for API requests
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-console.log('Base URL:', baseUrl); // Log the base URL for debugging
+const baseUrl = import.meta.env.VITE_API_URL;
 
-// Login function
 export const loginUser = async (credentials) => {
   try {
-    const loginUrl = `${baseUrl}/api/auth/login`;
-    console.log('Attempting login with URL:', loginUrl);
-    console.log('Request payload:', credentials);
-
-    const response = await fetch(loginUrl, {
+    console.log('Attempting login with URL:', `${baseUrl}/api/auth/login`);
+    
+    const response = await fetch(`${baseUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
+      credentials: 'include', // Add this for cookies if needed
       body: JSON.stringify(credentials),
     });
 
-    // Log the response status and body
-    console.log('Response Status:', response.status);
+    // Check if response is empty
     const text = await response.text();
-    console.log('Raw response:', text);
-
-    // Handle 503 Service Unavailable
-    if (response.status === 503) {
-      console.error('Service unavailable. Please try again later.');
-      throw new Error('Service unavailable. Please try again later.');
-    }
-
-    // Check if the response is OK
-    if (!response.ok) {
-      console.error('Login failed with status:', response.status, 'Response:', text);
-      throw new Error('Login failed: ' + text);
-    }
-
-    // Check if the response is empty
     if (!text) {
-      console.error('Empty response from server. Status:', response.status);
       throw new Error('Empty response from server');
     }
 
-    // Try to parse the response as JSON
+    // Try to parse the response
     let data;
     try {
       data = JSON.parse(text);
@@ -52,28 +30,28 @@ export const loginUser = async (credentials) => {
       throw new Error('Invalid JSON response from server');
     }
 
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+    
     // Store user data and token
     sessionStorage.setItem('authToken', data.token);
     localStorage.setItem('userData', JSON.stringify(data.user));
-
+    
     return data;
   } catch (error) {
     console.error('Login error details:', {
       message: error.message,
       stack: error.stack,
-      name: error.name,
+      name: error.name
     });
     throw error;
   }
 };
 
-// Register function
 export const registerUser = async (userData) => {
   try {
-    const registerUrl = `${baseUrl}/api/auth/register`;
-    console.log('Attempting registration with URL:', registerUrl);
-
-    const response = await fetch(registerUrl, {
+    const response = await fetch(`${baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +72,7 @@ export const registerUser = async (userData) => {
   }
 };
 
-// Utility functions
+// Add utility functions for authentication
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem('userData');
   return userStr ? JSON.parse(userStr) : null;
@@ -109,18 +87,18 @@ export const logout = () => {
   sessionStorage.removeItem('user');
 };
 
-// Check if user is authenticated
+// Function to check if user is authenticated
 export const isAuthenticated = () => {
   const token = getToken();
   return !!token;
 };
 
-// Get authenticated user data
+// Function to get authenticated user data
 export const getAuthenticatedUser = async () => {
   try {
     const response = await fetch(`${baseUrl}/api/auth/me`, {
       headers: {
-        Authorization: `Bearer ${getToken()}`,
+        'Authorization': `Bearer ${getToken()}`,
       },
     });
 
