@@ -26,6 +26,13 @@ export default function Login() {
       const data = await login(email, password);
       console.log('Login successful:', data);
       
+      // Save the token to sessionStorage
+      if (data.token) {
+        sessionStorage.setItem('authToken', data.token);
+      } else {
+        console.error('No token received from login');
+      }
+      
       setIsLoading(false);
       navigate('/user/profile', { replace: true });
       
