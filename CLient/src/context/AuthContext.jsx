@@ -35,22 +35,32 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      // Instead of decoding token client-side, validate with backend
-      const response = await fetch('/api/auth/validate', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Token invalid');
-      }
+      // First try to get existing userData from localStorage
+      const existingUserData = localStorage.getItem('userData');
+      const parsedExistingData = existingUserData ? JSON.parse(existingUserData) : null;
 
-      const userData = await response.json();
+      // Decode the JWT token to get user data including role
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      console.log('Decoded token:', decodedToken);
+
+      // Merge existing data with token data, preferring existing data for certain fields
+      const userData = {
+        id: decodedToken.id || decodedToken.sub,
+        email: decodedToken.email,
+        name: parsedExistingData?.name || decodedToken.name, // Preserve existing name
+        role: decodedToken.role,
+        mobile: parsedExistingData?.mobile || decodedToken.mobile, // Preserve existing mobile
+        // Add other non-sensitive fields as needed
+      };
+
+      console.log('User data from token:', userData);
+      
       setUser(userData);
+      localStorage.setItem('userData', JSON.stringify(userData));
       setLoading(false);
     } catch (error) {
-      logout(); // Clear invalid session
+      console.error('Auth check failed:', error);
+      setUser(null);
       setLoading(false);
     }
   };
@@ -65,36 +75,42 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      console.log('Attempting login with:', { email }); // Don't log password
+      // Log the environment and URL being used
+      console.log('Environment:', import.meta.env.MODE);
+      const apiUrl = import.meta.env.VITE_API_URL;
+      console.log('API URL:', apiUrl);
       
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include' // Important for CORS
+        // Remove credentials if using different domains in production
+        // credentials: 'include', 
+        body: JSON.stringify({ email, password })
       });
 
-      const data = await response.json();
-      console.log('Server response:', {
-        status: response.status,
-        ok: response.ok,
-        data: data
-      });
+      // Log the response details
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries([...response.headers]));
 
-      if (!response.ok) {
-        throw new Error(data.message || data.details || 'Login failed');
+      const text = await response.text();
+      console.log('Raw response:', text);
+
+      if (!text) {
+        throw new Error('Empty response from server');
       }
 
-      if (data.token && data.user) {
-        localStorage.setItem('token', data.token);
+      const data = JSON.parse(text);
+      
+      if (data.success) {
+        sessionStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
         setUser(data.user);
-        setIsAuthenticated(true);
-        return data;
-      } else {
-        throw new Error('Invalid response from server');
       }
+
+      return data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
