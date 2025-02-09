@@ -13,17 +13,16 @@ export function AuthProvider({ children }) {
     }
   });
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Initially set to false
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Add debug logging to track auth state
   useEffect(() => {
     console.log('Auth State Updated:', {
       user,
-      isAuthenticated: !!user,
+      isAuthenticated,
       isAdmin: user?.role === 'admin'
     });
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   // Updated to work with new storage mechanism
   const checkAuthStatus = async () => {
@@ -32,68 +31,58 @@ export function AuthProvider({ children }) {
       if (!token) {
         setLoading(false);
         setUser(null);
+        setIsAuthenticated(false); // If no token, ensure isAuthenticated is false
         return;
       }
 
-      // First try to get existing userData from localStorage
       const existingUserData = localStorage.getItem('userData');
       const parsedExistingData = existingUserData ? JSON.parse(existingUserData) : null;
 
-      // Decode the JWT token to get user data including role
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       console.log('Decoded token:', decodedToken);
 
-      // Merge existing data with token data, preferring existing data for certain fields
       const userData = {
         id: decodedToken.id || decodedToken.sub,
         email: decodedToken.email,
-        name: parsedExistingData?.name || decodedToken.name, // Preserve existing name
+        name: parsedExistingData?.name || decodedToken.name,
         role: decodedToken.role,
-        mobile: parsedExistingData?.mobile || decodedToken.mobile, // Preserve existing mobile
-        // Add other non-sensitive fields as needed
+        mobile: parsedExistingData?.mobile || decodedToken.mobile,
       };
 
       console.log('User data from token:', userData);
-      
+
       setUser(userData);
       localStorage.setItem('userData', JSON.stringify(userData));
+      setIsAuthenticated(true); // Token exists, set isAuthenticated to true
       setLoading(false);
     } catch (error) {
       console.error('Auth check failed:', error);
       setUser(null);
+      setIsAuthenticated(false); // On error, mark as not authenticated
       setLoading(false);
     }
   };
 
-  // Call checkAuthStatus when component mounts and when token changes
   useEffect(() => {
     checkAuthStatus();
-    // Add event listener for storage changes
     window.addEventListener('storage', checkAuthStatus);
     return () => window.removeEventListener('storage', checkAuthStatus);
   }, []);
 
   const login = async (email, password) => {
     try {
-      // Log the environment and URL being used
       console.log('Environment:', import.meta.env.MODE);
       const apiUrl = import.meta.env.VITE_API_URL;
       console.log('API URL:', apiUrl);
-      
+
       const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         },
-        // Remove credentials if using different domains in production
-        // credentials: 'include', 
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
-
-      // Log the response details
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries([...response.headers]));
 
       const text = await response.text();
       console.log('Raw response:', text);
@@ -103,11 +92,12 @@ export function AuthProvider({ children }) {
       }
 
       const data = JSON.parse(text);
-      
+
       if (data.success) {
         sessionStorage.setItem('authToken', data.token);
         localStorage.setItem('userData', JSON.stringify(data.user));
         setUser(data.user);
+        setIsAuthenticated(true); // Mark the user as authenticated on successful login
       }
 
       return data;
@@ -118,12 +108,11 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    // Clear both localStorage and sessionStorage
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('razorPayId');
     localStorage.removeItem('userData');
     setUser(null);
-    setIsAuthenticated(false);
+    setIsAuthenticated(false); // Ensure logged out state is properly handled
     setIsAdmin(false);
   };
 
@@ -150,9 +139,8 @@ export function AuthProvider({ children }) {
         name: updatedUser.name,
         role: updatedUser.role || user.role,
         mobile: updatedUser.mobile,
-        // Add other non-sensitive fields as needed
       };
-      
+
       setUser(normalizedUser);
       localStorage.setItem('userData', JSON.stringify(normalizedUser));
       return normalizedUser;
@@ -169,8 +157,8 @@ export function AuthProvider({ children }) {
     logout,
     updateUserProfile,
     checkAuthStatus,
-    isAuthenticated: !!user && !!sessionStorage.getItem('authToken'),
-    isAdmin: user?.role === 'admin'
+    isAuthenticated, // Directly returning the updated value
+    isAdmin: user?.role === 'admin',
   };
 
   return (
