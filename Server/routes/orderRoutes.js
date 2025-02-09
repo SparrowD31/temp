@@ -97,6 +97,9 @@ router.post('/orders', async (req, res) => {
   }
 });
 
+// Add this console log to debug route mounting
+console.log('Order routes initialized with base path:', process.env.API_PREFIX || '/api');
+
 // Get user's orders
 router.get('/orders', async (req, res) => {
   try {
@@ -118,37 +121,20 @@ router.get('/orders', async (req, res) => {
       });
     }
 
-    console.log('Executing database query for userId:', userId);
-    const orders = await Order.find({ userId })
-      .sort({ createdAt: -1 })
-      .lean(); // Add lean() for better performance
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 }).lean();
+    console.log('Orders found:', orders?.length || 0);
 
-    console.log('Query results:', orders);
-
-    // Check if any orders were found
+    // Send empty array instead of 404 when no orders found
     if (!orders || orders.length === 0) {
-      return res.status(404).json({ 
-        message: 'No orders found for this user',
-        userId: userId
-      });
+      return res.json([]); // Changed from 404 to return empty array
     }
 
     res.json(orders);
   } catch (error) {
-    console.error('Detailed error in /orders route:', {
-      error: error.message,
-      stack: error.stack,
-      userId: req.query.userId
-    });
-
+    console.error('Error fetching orders:', error);
     res.status(500).json({ 
       message: 'Failed to fetch orders',
-      error: error.message,
-      details: {
-        userId: req.query.userId,
-        errorName: error.name
-      },
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      error: error.message
     });
   }
 });
