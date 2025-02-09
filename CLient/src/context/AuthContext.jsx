@@ -13,16 +13,17 @@ export function AuthProvider({ children }) {
     }
   });
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Initially set to false
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Add debug logging to track auth state
   useEffect(() => {
     console.log('Auth State Updated:', {
       user,
-      isAuthenticated,
+      isAuthenticated: !!user,
       isAdmin: user?.role === 'admin'
     });
-  }, [user, isAuthenticated]);
+  }, [user]);
 
   // Updated to work with new storage mechanism
   const checkAuthStatus = async () => {
@@ -31,76 +32,69 @@ export function AuthProvider({ children }) {
       if (!token) {
         setLoading(false);
         setUser(null);
-        setIsAuthenticated(false); // If no token, ensure isAuthenticated is false
         return;
       }
 
-      const existingUserData = localStorage.getItem('userData');
-      const parsedExistingData = existingUserData ? JSON.parse(existingUserData) : null;
+      // Instead of decoding token client-side, validate with backend
+      const response = await fetch('/api/auth/validate', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Token invalid');
+      }
 
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      console.log('Decoded token:', decodedToken);
-
-      const userData = {
-        id: decodedToken.id || decodedToken.sub,
-        email: decodedToken.email,
-        name: parsedExistingData?.name || decodedToken.name,
-        role: decodedToken.role,
-        mobile: parsedExistingData?.mobile || decodedToken.mobile,
-      };
-
-      console.log('User data from token:', userData);
-
+      const userData = await response.json();
       setUser(userData);
-      localStorage.setItem('userData', JSON.stringify(userData));
-      setIsAuthenticated(true); // Token exists, set isAuthenticated to true
       setLoading(false);
     } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
-      setIsAuthenticated(false); // On error, mark as not authenticated
+      logout(); // Clear invalid session
       setLoading(false);
     }
   };
 
+  // Call checkAuthStatus when component mounts and when token changes
   useEffect(() => {
     checkAuthStatus();
+    // Add event listener for storage changes
     window.addEventListener('storage', checkAuthStatus);
     return () => window.removeEventListener('storage', checkAuthStatus);
   }, []);
 
   const login = async (email, password) => {
     try {
-      console.log('Environment:', import.meta.env.MODE);
-      const apiUrl = import.meta.env.VITE_API_URL;
-      console.log('API URL:', apiUrl);
-
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
+      console.log('Attempting login with:', { email }); // Don't log password
+      
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include' // Important for CORS
       });
 
-      const text = await response.text();
-      console.log('Raw response:', text);
+      const data = await response.json();
+      console.log('Server response:', {
+        status: response.status,
+        ok: response.ok,
+        data: data
+      });
 
-      if (!text) {
-        throw new Error('Empty response from server');
+      if (!response.ok) {
+        throw new Error(data.message || data.details || 'Login failed');
       }
 
-      const data = JSON.parse(text);
-
-      if (data.success) {
-        sessionStorage.setItem('authToken', data.token);
-        localStorage.setItem('userData', JSON.stringify(data.user));
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
         setUser(data.user);
-        setIsAuthenticated(true); // Mark the user as authenticated on successful login
+        setIsAuthenticated(true);
+        return data;
+      } else {
+        throw new Error('Invalid response from server');
       }
-
-      return data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -108,11 +102,12 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    // Clear both localStorage and sessionStorage
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('razorPayId');
     localStorage.removeItem('userData');
     setUser(null);
-    setIsAuthenticated(false); // Ensure logged out state is properly handled
+    setIsAuthenticated(false);
     setIsAdmin(false);
   };
 
@@ -139,8 +134,9 @@ export function AuthProvider({ children }) {
         name: updatedUser.name,
         role: updatedUser.role || user.role,
         mobile: updatedUser.mobile,
+        // Add other non-sensitive fields as needed
       };
-
+      
       setUser(normalizedUser);
       localStorage.setItem('userData', JSON.stringify(normalizedUser));
       return normalizedUser;
@@ -157,8 +153,8 @@ export function AuthProvider({ children }) {
     logout,
     updateUserProfile,
     checkAuthStatus,
-    isAuthenticated, // Directly returning the updated value
-    isAdmin: user?.role === 'admin',
+    isAuthenticated: !!user && !!sessionStorage.getItem('authToken'),
+    isAdmin: user?.role === 'admin'
   };
 
   return (
