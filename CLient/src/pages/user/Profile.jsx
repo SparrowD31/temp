@@ -144,9 +144,13 @@ export default function Profile() {
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch(`/api/users/${userId}`, {
+        // Get the base API URL from environment variable
+        const baseURL = import.meta.env.VITE_API_URL || '';
+        
+        const response = await fetch(`${baseURL}/api/users/${userId}`, {
           headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
           }
         });
         
@@ -155,8 +159,7 @@ export default function Profile() {
         }
         
         const data = await response.json();
-
-        console.log(data,'hj');
+        console.log('Fetched user data:', data);
         
         setUserData(data);
         dispatch(setUser(data));
@@ -192,15 +195,15 @@ export default function Profile() {
 
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/orders?userId=${userId}`, {
+        const baseURL = import.meta.env.VITE_API_URL || '';
+        const response = await fetch(`${baseURL}/api/orders?userId=${userId}`, {
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
           }
         });
         
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch orders');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();

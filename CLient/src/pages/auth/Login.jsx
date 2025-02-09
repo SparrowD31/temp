@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/loader/Loader';
@@ -13,9 +13,11 @@ export default function Login() {
   const location = useLocation();
   const message = location.state?.message;
 
-  if (user) {
-    return <Navigate to="/user/profile" replace />;
-  }
+  // Debug logging
+  useEffect(() => {
+    console.log('Current user state:', user);
+    console.log('Auth token:', sessionStorage.getItem('authToken'));
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,24 +26,27 @@ export default function Login() {
     
     try {
       const data = await login(email, password);
-      console.log('Login successful:', data);
+      console.log('Login response:', data);
       
-      // Save the token to sessionStorage
-      if (data.token) {
-        sessionStorage.setItem('authToken', data.token);
-      } else {
-        console.error('No token received from login');
+      // Force navigation after successful login
+      if (data && data.token) {
+        navigate('/user/profile', { replace: true });
+        window.location.reload(); // Force a page reload if needed
       }
-      
-      setIsLoading(false);
-      navigate('/user/profile', { replace: true });
       
     } catch (err) {
       console.error('Login error:', err);
       setError('Invalid email or password');
+    } finally {
       setIsLoading(false);
     }
   };
+
+  // If user is already logged in, redirect to profile
+  if (user) {
+    console.log('User detected, redirecting to profile');
+    return <Navigate to="/user/profile" replace />;
+  }
 
   return (
     <>

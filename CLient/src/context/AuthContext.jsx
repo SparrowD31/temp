@@ -25,13 +25,13 @@ export function AuthProvider({ children }) {
     });
   }, [user]);
 
-  // Updated to work with new storage mechanism
   const checkAuthStatus = async () => {
     try {
       const token = sessionStorage.getItem('authToken');
       if (!token) {
         setLoading(false);
         setUser(null);
+        setIsAuthenticated(false);
         return;
       }
 
@@ -47,53 +47,44 @@ export function AuthProvider({ children }) {
       const userData = {
         id: decodedToken.id || decodedToken.sub,
         email: decodedToken.email,
-        name: parsedExistingData?.name || decodedToken.name, // Preserve existing name
+        name: parsedExistingData?.name || decodedToken.name,
         role: decodedToken.role,
-        mobile: parsedExistingData?.mobile || decodedToken.mobile, // Preserve existing mobile
-        // Add other non-sensitive fields as needed
+        mobile: parsedExistingData?.mobile || decodedToken.mobile,
       };
 
       console.log('User data from token:', userData);
       
       setUser(userData);
+      setIsAuthenticated(true);
+      setIsAdmin(userData.role === 'admin');
       localStorage.setItem('userData', JSON.stringify(userData));
       setLoading(false);
     } catch (error) {
       console.error('Auth check failed:', error);
       setUser(null);
+      setIsAuthenticated(false);
       setLoading(false);
     }
   };
 
-  // Call checkAuthStatus when component mounts and when token changes
   useEffect(() => {
     checkAuthStatus();
-    // Add event listener for storage changes
     window.addEventListener('storage', checkAuthStatus);
     return () => window.removeEventListener('storage', checkAuthStatus);
   }, []);
 
   const login = async (email, password) => {
     try {
-      // Log the environment and URL being used
-      console.log('Environment:', import.meta.env.MODE);
-      const apiUrl = import.meta.env.VITE_API_URL;
-      console.log('API URL:', apiUrl);
+      console.log('Login attempt for:', email);
       
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        // Remove credentials if using different domains in production
-        // credentials: 'include', 
         body: JSON.stringify({ email, password })
       });
-
-      // Log the response details
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries([...response.headers]));
 
       const text = await response.text();
       console.log('Raw response:', text);
@@ -104,13 +95,33 @@ export function AuthProvider({ children }) {
 
       const data = JSON.parse(text);
       
-      if (data.success) {
+      if (data.token) {
+        // First set the token
         sessionStorage.setItem('authToken', data.token);
-        localStorage.setItem('userData', JSON.stringify(data.user));
-        setUser(data.user);
+        
+        // Then set user data
+        const userData = {
+          ...data.user,
+          id: data.user._id || data.user.id // Ensure we have a consistent id field
+        };
+        
+        // Update localStorage
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
+        // Update state
+        setUser(userData);
+        setIsAuthenticated(true);
+        setIsAdmin(userData.role === 'admin');
+        
+        console.log('Login successful, user state updated:', userData);
+        
+        // Trigger a manual check of auth status
+        await checkAuthStatus();
+        
+        return data;
+      } else {
+        throw new Error(data.message || 'Login failed');
       }
-
-      return data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -118,7 +129,6 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    // Clear both localStorage and sessionStorage
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('razorPayId');
     localStorage.removeItem('userData');
@@ -150,10 +160,10 @@ export function AuthProvider({ children }) {
         name: updatedUser.name,
         role: updatedUser.role || user.role,
         mobile: updatedUser.mobile,
-        // Add other non-sensitive fields as needed
       };
       
       setUser(normalizedUser);
+      setIsAuthenticated(true);
       localStorage.setItem('userData', JSON.stringify(normalizedUser));
       return normalizedUser;
     } catch (error) {
@@ -169,8 +179,8 @@ export function AuthProvider({ children }) {
     logout,
     updateUserProfile,
     checkAuthStatus,
-    isAuthenticated: !!user && !!sessionStorage.getItem('authToken'),
-    isAdmin: user?.role === 'admin'
+    isAuthenticated,
+    isAdmin
   };
 
   return (
